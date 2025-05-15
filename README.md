@@ -1,23 +1,20 @@
 
-# Asterisk 18 Docker Setup
+# Запуск Asterisk 18 в Docker
 
-This guide explains how to run Asterisk 18 using the Docker image `andrius/asterisk` with custom configuration files.
-
----
-
-## Prerequisites
-
-- Docker installed on your machine
-- Configuration files prepared:
-  - `sip.conf`
-  - `extensions.conf`
-  - `rtp.conf`
-  - `modules.conf`
-- Sound files located in a folder named `sounds`
+## Описание
+Этот репозиторий содержит конфигурационные файлы для запуска Asterisk 18 с помощью Docker образа `andrius/asterisk`.
 
 ---
 
-## Configuration example for `sip.conf`
+## Требования
+- Установлен Docker (https://docs.docker.com/get-docker/)
+- Порт 5060 (UDP и TCP) и диапазон портов 10000-10100 UDP свободны для проброса
+- Конфигурационные файлы расположены в папке `config/`
+- Звуковые файлы для IVR в папке `sounds/`
+
+---
+
+## Конфигурация SIP (`config/sip.conf`)
 
 ```ini
 [general]
@@ -43,13 +40,11 @@ qualify=yes
 dtmfmode=rfc2833
 ```
 
-Make sure to add your external IP in `localnet` if you want to use Asterisk behind NAT.
+> При необходимости в `localnet` можно указать внутренний IP вашей сети, а также в конфигурацию добавить внешний IP, если он есть.
 
 ---
 
-## Running Asterisk in Docker
-
-Run the following command from the folder where your `config` folder and `sounds` folder are located:
+## Команда запуска Docker контейнера
 
 ```bash
 docker run -d \
@@ -67,30 +62,39 @@ docker run -d \
 
 ---
 
-## Checking logs and connecting
+## Проверка
 
-- To view logs and console output:
-
-```bash
-docker logs -f asterisk
-```
-
-- To connect to the running Asterisk CLI:
+- После запуска контейнера, подключитесь к консоли Asterisk:
 
 ```bash
 docker exec -it asterisk asterisk -rvvv
 ```
 
+- Проверьте зарегистрированных SIP-пиров командой:
+
+```
+sip show peers
+```
+
+- Для теста звонка используйте:
+
+```
+channel originate SIP/kurbanov extension 7001@ivr
+```
+
 ---
 
-## Notes
+## Полезные советы
 
-- The RTP port range `10000-10100` is required for audio streams.
-- Make sure the `sounds` directory contains your audio prompts in the correct format (e.g., `.wav`, `.gsm`, `.slin`).
-- Adjust `localnet` and `nat` settings in `sip.conf` to match your network setup.
-- If you use an external IP address or a public network, ensure your firewall/router forwards ports 5060 and 10000-10100 UDP.
+- Убедитесь, что ваши звуковые файлы находятся в `/var/lib/asterisk/sounds/` внутри контейнера.
+- Проверьте, что порты 5060 (UDP/TCP) и диапазон RTP (10000-10100 UDP) проброшены корректно.
+- Для доступа с внешних сетей добавьте правильные настройки NAT в `sip.conf`.
 
 ---
 
-If you encounter any issues, check the Asterisk logs and ensure your configuration files are valid.
+## Лицензия
+Данная инструкция и конфигурации предоставлены "как есть" без гарантий.
 
+---
+
+Если есть вопросы, обращайтесь!
