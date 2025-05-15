@@ -1,0 +1,18 @@
+docker run -d \
+  --name asterisk \
+  -p 5060:5060/udp \
+  -p 5060:5060/tcp \
+  -p 10000-10100:10000-10100/udp \
+  -v $(pwd)/config/sip.conf:/etc/asterisk/sip.conf \
+  -v $(pwd)/config/extensions.conf:/etc/asterisk/extensions.conf \
+  -v $(pwd)/config/rtp.conf:/etc/asterisk/rtp.conf \
+  -v $(pwd)/config/modules.conf:/etc/asterisk/modules.conf \
+  -v $(pwd)/sounds:/var/lib/asterisk/sounds/ \
+  andrius/asterisk
+
+
+scp ./config/sip.conf progr@34.245.107.249:~/asterisk/config/
+scp ./config/extensions.conf progr@34.245.107.249:~/asterisk/config/
+scp ./config/rtp.conf progr@34.245.107.249:~/asterisk/config/
+scp ./config/modules.conf progr@34.245.107.249:~/asterisk/config/
+scp -r ./sounds progr@34.245.107.249:~/asterisk/
